@@ -32,6 +32,6 @@ jobs:
         with:
           node-version: 22
       - name: Extension tests
-        run: node --test extension/tests/
+        run: node --test 'extension/tests/*.test.mjs'
       - name: Script syntax
         run: for f in scripts/*.sh; do bash -n "$f"; done
