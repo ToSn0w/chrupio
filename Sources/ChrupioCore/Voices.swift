@@ -321,13 +321,26 @@ public struct VoicePrints: Codable, Sendable, Equatable {
         guard !candidates.isEmpty else { return nil }
         let scale = Self.scale(people.values.map(\.mean) + [vector])
         let attendeeKeys = Set(attendees.map { $0.lowercased() })
-        let scored = candidates.map { (name: $0.key, distance: zip(zip($0.value.mean, vector), scale).map { pair, s in pow((pair.0 - pair.1) / s, 2) }.reduce(0, +) / Float(vector.count)) }
-            .map { ($0.name, $0.distance.squareRoot() * (attendeeKeys.contains($0.name.lowercased()) ? 0.85 : 1)) }
-            .sorted { $0.1 < $1.1 }
+        let scored: [(String, Float)] = candidates.map { entry in
+            let distance = Self.distance(entry.value.mean, vector, scale: scale)
+            let weight: Float = attendeeKeys.contains(entry.key.lowercased()) ? 0.85 : 1
+            return (entry.key, distance * weight)
+        }
+        .sorted { $0.1 < $1.1 }
         guard let best = scored.first, best.1 < VoiceAttribution.printDistance else { return nil }
         // Too close a runner-up means the voices can't be told apart.
         if scored.count > 1, scored[1].1 - best.1 < 0.05 { return nil }
         return best.0
+    }
+
+    /// Root mean square of the per-dimension differences, each divided by its scale.
+    static func distance(_ a: [Float], _ b: [Float], scale: [Float]) -> Float {
+        var sum: Float = 0
+        for index in 0..<min(a.count, b.count, scale.count) {
+            let difference: Float = (a[index] - b[index]) / scale[index]
+            sum += difference * difference
+        }
+        return (sum / Float(b.count)).squareRoot()
     }
 
     /// Per-dimension spread; a floor keeps a single stored print from dividing by zero.
