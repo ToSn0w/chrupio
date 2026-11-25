@@ -1,0 +1,19 @@
+.build/
+dist/
+.swiftpm/
+*.xcodeproj
+xcuserdata/
+.DS_Store
+node_modules/
+__pycache__/
+*.pyc
+
+# Recordings and benchmark clips: real meeting audio never goes into git.
+*.wav
+*.caf
+*.m4a
+docs/asr-samples/
+docs/crash/
+
+# Local agent settings.
+.claude/

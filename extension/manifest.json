@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "Chrupio Companion",
+  "description": "Tells the Chrupio macOS app when you are in a Google Meet, Microsoft Teams, Slack huddle or Zoom web call, and who is in it.",
+  "version": "1.0.0",
+  "minimum_chrome_version": "116",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApfSFAx0TXf8OBp0BVwIYZ6idoCodzi7iyGPdiIQ6AaG2jcp3e8dm0kHB1EtbvA1Go9HqEAqdczT4hoZfgPGui+ECmS65C/kGdccMCPf+9jWZJvjyb14avEJ75H05Cmh15YmTlXS5pnBpiCaiE60JLRjlghd0re+cmngjD+LMvvqJUWxs1+9ORgM7IMUm7gbhJaj6QhMwCPUKSOaFvVtqLRZ8KjDEk6oAPwsndMHiQ7frp7LYnZsuTG59P8r2TYv9y+VLYnAgWnYTLS96GA7kcBhNs8gzmTj9Xh3F/lH/+uFlOLwmnbtyq5ZBRSJdZreuRRJPO+f5L1v3XjKfE7wT/QIDAQAB",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Chrupio",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["alarms", "scripting", "storage"],
+  "host_permissions": [
+    "http://127.0.0.1:47811/*",
+    "https://meet.google.com/*",
+    "https://teams.microsoft.com/*",
+    "https://teams.live.com/*",
+    "https://teams.cloud.microsoft/*",
+    "https://app.slack.com/*",
+    "https://*.zoom.us/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://meet.google.com/*"],
+      "js": ["content/common.js", "content/meet.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://teams.microsoft.com/*",
+        "https://teams.live.com/*",
+        "https://teams.cloud.microsoft/*"
+      ],
+      "js": ["content/common.js", "content/teams.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://app.slack.com/*"],
+      "js": ["content/common.js", "content/slack.js"],
+      "run_at": "document_idle",
+      "match_about_blank": true,
+      "match_origin_as_fallback": true
+    },
+    {
+      "matches": ["https://*.zoom.us/wc/*"],
+      "js": ["content/common.js", "content/zoom.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
