@@ -656,7 +656,7 @@ final class ExtensionServerBindTests: XCTestCase {
         try reopened.start(onReady: { _ in readyAfter.value = Date().timeIntervalSince(started); settled.fulfill() },
                            onFailure: { failure.value = $0; settled.fulfill() })
         defer { reopened.stop() }
-        await fulfillment(of: [settled], timeout: 40)
+        await fulfillment(of: [settled], timeout: 70) // past the 61 s retry window, so it always settles
         print("port \(port): ready after \(readyAfter.value.map { String(format: "%.1f s", $0) } ?? "never"), failure \(String(describing: failure.value))")
         XCTAssertNil(failure.value, "no banner while the old connections expire")
         let waited = try XCTUnwrap(readyAfter.value)
